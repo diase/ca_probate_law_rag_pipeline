@@ -9,7 +9,7 @@ def scrape_page(url):
     # Parse HTML
     soup = BeautifulSoup(response.text, "html.parser")
 
-    return soup
+    return soup 
 
 
 if __name__ == "__main__":
