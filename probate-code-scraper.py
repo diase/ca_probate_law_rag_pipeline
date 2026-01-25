@@ -11,10 +11,12 @@ def scrape_page(url):
 
     return soup 
 
-
 if __name__ == "__main__":
     url = "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=PROB&sectionNum=4."
     soup = scrape_page(url)
 
     # Example: print page title
     print(soup.title.text)
+
+    with open("output.txt", "a", encoding="utf-8") as f:
+        print(soup.title.text, file=f)
