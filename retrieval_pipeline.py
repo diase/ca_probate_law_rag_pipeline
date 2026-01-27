@@ -2,9 +2,8 @@ from json import load
 import os
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
-#from langchain_ollama import OllamaLLM
-#print("Imported Ollama =", OllamaLLM)
-from langchain_google_genai import ChatGoogleGenerativeAI
+#from langchain_google_genai import ChatGoogleGenerativeAI
+import google.genai as genai
 from dotenv import load_dotenv 
 
 load_dotenv()
@@ -32,9 +31,10 @@ def main():
     print("Chroma DB loaded")
     print("Total chunks in DB:", db._collection.count())
 
-    #3. Initialize Ollama LLM
-    llm = ChatGoogleGenerativeAI( model="gemini-pro", api_key="AIzaSyCTznmCUyEEAvFm9TTUfNuIqU3RaQcr1_E", temperature=0.2 )
-    response = llm.invoke(prompt)
+    #3. Initialize Gemini LLM
+    #llm = ChatGoogleGenerativeAI( model="gemini-pro", api_key=gemini_api_key, temperature=0.2 )
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    print("Gemini LLM initialized")
 
     while True:
         query = input("\nAsk a question (or 'q' to quit): ")
@@ -56,7 +56,6 @@ def main():
         #5 Set cosine similarity threshold
         similarities = [1 - dist for _, dist in raw_results]
         threshold = max(similarities) * 0.2 # keep top 80% of relevance
-        #threshold = 0.3
         filtered_docs = []
 
         for doc, distance in raw_results:
@@ -74,7 +73,7 @@ def main():
         #6. Build context from retrieved docs
         context = build_context(filtered_docs)
 
-        #7. Build prompt from Llama
+        #7. Build prompt from Gemini
         prompt = f"""You are a helpful assistant answering questions based only on the provided context.
 
         Context:
@@ -86,12 +85,12 @@ def main():
         Answer clearly and concisely. If the answer is not in the context, say you don't know.
         """
 
-        #8. Get answer from Llama
+        #8. Get answer from Gemini
         print("\n--- Retrieved Context ---\n")
         print(context)
         print("\n--- Answer ---\n")
-        answer = llm.invoke(prompt)
-        print(answer)
+        response = client.models.generate_content( model="models/gemini-2.5-flash", contents=prompt ) 
+        print(response.text)
 
 if __name__ == "__main__":
     main()
