@@ -19,21 +19,18 @@ def scrape_page(url):
 
 if __name__ == "__main__":
 
-    code = "1"
-    url = f'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=PROB&sectionNum={code}.'
+    number = "1"
+    url = f'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=PROB&sectionNum={number}.'
 
     soup = scrape_page(url)
 
-    while int(code) < 27100:
-        match = re.search(fr'(?:.*){code}\. \s*(.*)', soup.text, re.DOTALL)
-        if match:
-            code_text = match.group(1).strip()
-            #print("Section number:", code)
-            #print("Text:", code_text)
+    while int(number) < 27100:
+        provision_text = "\n".join(p.get_text(strip=True) for p in soup.select("font > p"))
 
-            with open("output.txt", "a", encoding="utf-8") as f:
-                print(code + ": " + code_text, file=f)
+        with open("output.txt", "a", encoding="utf-8") as f:
+            if provision_text:
+                print("Provision " + number + ":\n" + provision_text, file=f)
 
-        code = str(int(code) + 1)
-        url = f'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=PROB&sectionNum={code}.'
+        number = str(int(number) + 1)
+        url = f'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=PROB&sectionNum={number}.'
         soup = scrape_page(url)
