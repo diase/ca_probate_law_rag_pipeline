@@ -1,7 +1,4 @@
-from encodings.punycode import generate_generalized_integer
-from json import load
 import os
-from google.genai.types import GenerationConfig
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 import google.generativeai as genai
@@ -61,6 +58,7 @@ def main():
             print(f"[Document {i}]") 
             print(doc.page_content) 
             print("\n---\n")
+
         #6. Build content for Gemini
         contents = [
             {"role": "user",

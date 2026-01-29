@@ -1,12 +1,10 @@
 import os
-from langchain_community.document_loaders import TextLoader, DirectoryLoader
 import re
 #from langchain.schema import Document
 from langchain_core.documents import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from dotenv import load_dotenv
-
 import shutil
 if os.path.exists("chroma_db"):
     shutil.rmtree("chroma_db")
@@ -15,14 +13,7 @@ load_dotenv()
 
 def main():
 
-    #1 Load File
-    print("Loading File")
-    from functools import partial 
-    loader = DirectoryLoader( "docs/", glob="*.txt", loader_cls=partial(TextLoader, encoding="utf-8") )
-    document = loader.load()
-    print(f"Loaded {len(document)} document.")
-
-    #2 Chunk Files
+    #1 Chunk Files
     print("Chunking File")
     with open("docs/output.txt", "r", encoding="utf-8") as f:
         text = f.read()
@@ -40,7 +31,7 @@ def main():
     
     print("Chunking complete")
 
-    #3 Embed and Store in DB
+    #2 Embed and Store in DB
     print("Embedding and Storing in DB")
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     db = Chroma.from_documents(documents, embeddings, persist_directory="chroma_db")
