@@ -1,0 +1,211 @@
+# Check if you can use a simple process to transfer property
+
+Not all estates need to go through formal probate. Depending on how the property is owned, and the type and amount of property, you may be able to use a simpler court process to collect and transfer property after a persons dies.
+
+Jump to:
+
+- Options to transfer property without formal probate
+
+- Maximum property values for summary succession cases
+
+- Key takeaways
+
+## Options to transfer property without formal probate
+
+## Property that is a government benefit
+
+Most government benefits, like social security survivor benefits, can be collected without going to probate court.
+
+## The property has a named beneficiary or someone else on the title
+
+### Property with named beneficiaries
+
+Find out if the person who died listed anyone as a beneficiary on the property. This is common in certain types of property, for example:
+
+- Life insurance proceeds
+
+- Bank or retirement accounts
+
+- Pensions
+
+- Annuities
+
+- Property in a living trust
+
+If you are named as a beneficiary, you should be able to transfer the property to yourself without going to probate court.
+
+### Property with someone else on the title
+
+If the person owned any property (like real estate), you will want to see how it is owned (the title of ownership or the deed) and if there is any right of survivorship.
+
+- If the property is owned in joint tenancy, the surviving owner gets the property
+
+- If the property provides for "transfer on death", it can transfer automatically to the person listed as an owner
+
+- If the property is owned by spouses as community property (from a marriage or registered domestic partnership), the surviving spouse may have the right to survivorship.
+
+Also, check bank accounts. These can be joint accounts with rights to survivorship.
+
+## The estate is a "small estate" (valued under a set amount)
+
+You can transfer property without opening probate if the estate is valued under a set amount. That amount changes every few years and is based on the year the person passed away.
+
+- If the person died on April 1, 2022, or later, it is $184,500
+
+- If the person died before April 1, 2022, the limit is $166,250
+
+You can find the latest limits inMaximum Values for Small Estate Set-Aside & Disposition of Estate Without Administration(form DE-300).
+
+How to figure out the value of the estate
+
+Add up the value of:
+
+- All real and personal property
+
+- All life insurance or retirement benefits that will be paid to the estate (but not any insurance or retirement benefits designated to be paid to some other person)
+
+Do not include:
+
+- Cars, boats, or mobile homes
+
+- Real property outside of California
+
+- Property held in trust, including a living trust
+
+- Real or personal property that the person who died owned with someone else (joint tenancy)
+
+- Property (community, quasi-community, or separate) that passed directly to the surviving spouse or domestic partner
+
+- Life insurance, death benefits or other assets not subject to probate that pass directly to the beneficiaries
+
+- Unpaid salary or other compensation up to the amount listed inMaximum Values for Small Estate Set-Aside & Disposition of Estate Without Administration(form DE-300)
+
+- The debts or mortgages of the person who died. (You are not allowed to subtract the debts of the person who died.
+
+- Bank accounts owned by multiple persons, including the person who died
+
+You can get a more detailed explanation inCalifornia Probate Code section 13050.
+
+If the total value of these assets is at the set amount or less and 40 days have passed since the death, you can:
+
+Transfer personal property using an Affidavit
+
+## A surviving spouse or domestic partner owns the property (community property)
+
+If a surviving spouse or domestic partner is legally entitled to all the property, they can file a spousal property petition. This is faster and less complicated than opening probate. For example, a couple that was married for decades may only own community property, which belongs to the surviving spouse or partner and is confirmed or passed by the court in the spousal property petition case.
+
+There must be proof to support whether something is community property. For example, deeds and bank statements may be helpful documents to find out how the title to an asset has been held during the marriage or domestic partnership. If the person who died had a will, review the will to be sure they did not leave their property to someone else (not their spouse). The spouses may also have had an agreement, called a prenuptial agreement or prenup for short, that says an asset is not community property. You may need totalk to a lawyerif you're not sure.
+
+If the property is community property, the spouse or domestic partner can fill out and file aSpousal or Domestic Partner Property Petition(form DE-221) to get a court order that says:
+
+- What their share of the community property is
+
+- What part of their deceased spouse's or domestic partner’s share of community and separate property belongs to them
+
+## Maximum property values for summary succession cases
+
+California law lets you use simpler “summary succession” procedures if the property is worth less than a set amount.These are faster, easier legal processes to transfer a person’s property after they die—without going through the full probate court process.
+
+You may be able to use summary succession if:
+
+- The property is under a certain value
+
+- The person died on a certain date
+
+- A specific law (Probate Code section) applies to the property
+
+These amounts are updated every 3 years. The last updates were onApril 1, 2022, andApril 1, 2025. The next update will be onApril 1, 2028.
+
+### Updated property limits
+
+#### Probate Code sections 6602, 6609
+
+What it’s used for:Limited amount that can be set aside from the person’s estate for the immediate needs of their spouse and minor children.
+
+- Limit if the person died before April 1, 2022:$85,900
+
+- April 1, 2022 – March 31, 2025:$95,325
+
+- On or after April 1, 2025:$107,900
+
+#### Probate Code section 13050(c)
+
+What it’s used for:Limits some property, like money owed to thedecedentfrom serving in the military or other employment, from being included in the total value of their estate
+
+- Property limit if the person died before April 1, 2022:$16,625
+
+- April 1, 2022 – March 31, 2025:$18,450
+
+- On or after April 1, 2025:$20,875
+
+#### Probate Code sections 13100, 13101
+
+If the person’s estate is under a certain value, you can collect or transfer theirpersonal propertywithout going through the full probate process.
+
+- Maximum estate value if the person died before April 1, 2022:$166,250
+
+- April 1, 2022 – March 31, 2025:$184,500
+
+- On or after April 1, 2025:$208,850
+
+#### Probate Code sections 13151–13154
+
+What it’s used for:If the person’smainhome is worth less than a set amount, you can ask the court to transfer ownership of their home without going through the full probate process
+
+- Home value limit if the person died before April 1, 2022:$166,250
+
+- April 1, 2022 – March 31, 2025:$184,500
+
+- On or after April 1, 2025: $750,000
+
+#### Probate Code section 13200
+
+What it’s used for:Allows you to ask the court for the person’sreal propertyif it’s under a set amount
+
+- Real property limit if the person died before April 1, 2022:$55,425
+
+- April 1, 2022 – March 31, 2025:$61,500
+
+- On or after April 1, 2025:$69,625
+
+#### Probate Code sections 13600–13601
+
+What it’s used for:If you are the person’s spouse, you can collect up to a set amount of their earnings from their employer
+
+- Limit of earnings you can collect if the person died before April 1, 2022:$16,625
+
+- April 1, 2022 – March 31, 2025:$18,450
+
+- On or after April 1, 2025:$20,875
+
+### What changed in 2025?
+
+Assembly Bill 2016made two important changes to the law for real property.
+
+- It raised themaximum valueof real property for certain petitions to$750,000
+
+- It limited this procedure to thedecedent’s main home in California
+
+This applies to real property petitions underProbate Code sections 13150–13157.
+
+### When are the limits updated?
+
+Probate Code section 890says theJudicial Councilmust adjust these amounts every 3 years using a formula in the law. These adjustments help account for inflation and changes in property values.
+
+The next update will be onApril 1, 2028, unless a new law changes it earlier.
+
+## What if none of these options apply to my situation?
+
+If these options don't apply to your situation, you may need to go through the formal probate process.
+
+Read about formal probate
+
+## Key takeaways
+
+- You may be able toavoid full probateif the property’s value is under certain limits.
+
+- Thevalue limit dependson when the person died and what kind of property it is.
+
+- These limits areupdated every 3 years.
+
+- A new law in 2025 raised the limit for real property to$750,000, but only if it was the person’smain homein California.
