@@ -1,3 +1,4 @@
+from importlib import metadata
 import os
 import re
 #from langchain.schema import Document
@@ -14,7 +15,9 @@ load_dotenv()
 def main():
 
     #1 Chunk Files
-    print("Chunking File")
+    print("Chunking Files")
+
+    #chunking output.txt
     with open("docs/output.txt", "r", encoding="utf-8") as f:
         text = f.read()
 
@@ -27,7 +30,232 @@ def main():
         header = parts[i]
         body = parts[i+1].strip()
         full_text = f"{header}\n{body}"
-        documents.append(Document(page_content=full_text))
+        documents.append(Document(page_content=full_text, metadata={"source":"https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB"}))
+    
+    #chunking self_help_formal_probate.txt
+    with open("docs/self_help_formal_probate.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/probate/formal-probate"
+                    }
+                )
+            )
+
+    #chunking self_help_guardianship.txt
+    with open("docs/self_help_guardianship.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/guardianship"
+                    }
+                )
+            )
+
+    #chunking self_help_impairment.txt
+    with open("docs/self_help_impairment.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/helping-person-impairment-or-disability"
+                    }
+                )
+            )
+
+    #chunking self_help_inventory.txt
+    with open("docs/self_help_inventory.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/probate/inventory-estimate-value"
+                    }
+                )
+            )
+
+    #chunking self_help_probate.txt
+    with open("docs/self_help_probate.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/probate"
+                    }
+                )
+            )
+
+    #chunking self_help_simple_process.txt
+    with open("docs/self_help_simple_process.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/probate/simple-transfer"
+                    }
+                )
+            )
+
+    #chunking self_help_small_estate3.txt
+    with open("docs/self_help_small_estate3.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/probate/small-estate"
+                    }
+                )
+            )
+
+    #chunking self_help_terms.txt
+    with open("docs/self_help_terms.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/probate/terms"
+                    }
+                )
+            )
+
+    #chunking self_help_wills.txt
+    with open("docs/self_help_wills.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    #Split on #
+    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+
+    for i in range(1, len(parts), 2):
+        if i + 1 < len(parts):
+            header = parts[i].strip()
+            body = parts[i+1].strip()
+        
+            if not body: continue # Skip headers with no text
+            
+            full_text = f"{header}\n{body}"
+        
+            documents.append(
+                Document(
+                    page_content=full_text,
+                    metadata={
+                        "source": "https://selfhelp.courts.ca.gov/wills-estates-probate/legal-documents"
+                    }
+                )
+            )
     
     print("Chunking complete")
 
