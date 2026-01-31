@@ -1,4 +1,3 @@
-from importlib import metadata
 import os
 import re
 #from langchain.schema import Document
@@ -264,7 +263,7 @@ def main():
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     db = Chroma.from_documents(documents, embeddings, persist_directory="chroma_db")
     
-
+    print(f"Verified metadata for first chunk: {documents[0].metadata}")
     print("Ingestion complete")
 
 if __name__ == "__main__":

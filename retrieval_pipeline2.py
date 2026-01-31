@@ -25,12 +25,13 @@ def main():
             break 
 
         #4. Retrieve top k results with scores(Cosine Distance)
-        raw_results = db.similarity_search_with_score(query, k=20)
+        raw_results = db.similarity_search_with_score(query, k=5)
         print("\n--- Similarities ---")
         for doc, dist in raw_results:
             similarity = 1 - dist  # Convert distance to similarity
             print(f"distance={dist:.4f}, similarity={similarity:.4f}")
 
+        """
         #5 Set cosine similarity threshold
         similarities = [1 - dist for _, dist in raw_results]
         #threshold = max(similarities) * 0.2 # keep any document that is at least 20% of the top similarity
@@ -47,15 +48,21 @@ def main():
             similarity = 1 - distance  # Convert distance to similarity
             if similarity >= threshold:
                 filtered_docs.append(doc)
+        """
+        filtered_docs = raw_results
 
         #Handle no results
+        """
         if not filtered_docs:
             print(f"\nNo documents found above similarity threshold {threshold}.")
             continue
+        """
+
         #Print Retrieved Docs
         print("\n--- Retrieved Documents ---\n") 
-        for i, doc in enumerate(filtered_docs, 1): 
-            print(f"[Document {i}]") 
+        for i, (doc, score) in enumerate(filtered_docs, 1): 
+            print(f"[Document {i}]")
+            print(doc.metadata.get("source"))
             print(doc.page_content) 
             print("\n---\n")
 
@@ -71,7 +78,7 @@ def main():
             }
         ]
         # Add each retrieved document as its own part
-        for doc in filtered_docs: 
+        for doc, score in filtered_docs: 
             contents.append({ "role": "user", "parts": [ {"text": doc.page_content} ] })
 
         #7. Get answer from Gemini
