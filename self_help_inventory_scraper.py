@@ -49,7 +49,7 @@ def main():
         elif tag.name == "ul":
             continue #want only list items
         elif tag.name == "li":
-            extracted.append(f"- {text}")
+            extracted.append(f"* {text}")
         else:
             extracted.append(text)
 
