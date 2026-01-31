@@ -1,0 +1,9 @@
+self_help_probate: https://selfhelp.courts.ca.gov/probate
+self_help_terms: https://selfhelp.courts.ca.gov/probate/terms
+self_help_inventory: https://selfhelp.courts.ca.gov/probate/inventory-estimate-value
+self_help_simple_process: https://selfhelp.courts.ca.gov/probate/simple-transfer
+self_help_small_estate: https://selfhelp.courts.ca.gov/probate/small-estate
+self_help_formal_probate: https://selfhelp.courts.ca.gov/probate/formal-probate
+self_help_impairment: https://selfhelp.courts.ca.gov/helping-person-impairment-or-disability
+self_help_guardianship: https://selfhelp.courts.ca.gov/guardianship
+self_help_wills: https://selfhelp.courts.ca.gov/wills-estates-probate/legal-documents
