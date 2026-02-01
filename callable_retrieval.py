@@ -24,6 +24,7 @@ class RetrievalPipeline:
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
         print("Gemini LLM initialized")
 
+        print(f"Your Question: {question}")
         
         query = question
         if query.lower() in {"q", "quit", "exit"}:
