@@ -1,1 +1,3 @@
 Use pip freeze > requirements.txt to generate the requirements file for the pip installs that were done and then use pip install -r requirements.txt in the command line to recreate the requirements
+
+Old instructions to Gemini under text: You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely. If the answer is not in the context, say you don't know.
