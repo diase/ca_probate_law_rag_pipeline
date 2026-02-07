@@ -1,45 +1,51 @@
 import os
 import re
-#from langchain.schema import Document
 from langchain_core.documents import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
-from dotenv import load_dotenv
+import statute_docs_chunker
+import self_help_docs_chunker
+#import rule_docs_chunker
+#import form_docs_chunker
 import shutil
-if os.path.exists("chroma_db"):
-    shutil.rmtree("chroma_db")
 
-load_dotenv()
+if os.path.exists("statute_db"):
+    shutil.rmtree("statute_db")
+if os.path.exists("self_help_db"):
+    shutil.rmtree("self_help_db")
+if os.path.exists("rule_db"):
+    shutil.rmtree("rule_db")
+if os.path.exists("form_db"):
+    shutil.rmtree("form_db")
 
 def main():
 
     #1 Chunk Files
-    print("Chunking Files")
+    print("Chunking Statute Files")
+    statute_parts = statute_docs_chunker.main()
 
-    #chunking output.txt
-    with open("docs/output.txt", "r", encoding="utf-8") as f:
-        text = f.read()
+    statute_documents = []
 
-    # Split on "Provision X:" but keep the header
-    parts = re.split(r"(Provision\s+\d+:)", text)
-
-    documents = []
-
-    for i in range(1, len(parts), 2):
-        header = parts[i]
-        body = parts[i+1].strip()
+    for i in range(1, len(statute_parts) - 1, 2):
+        header = statute_parts[i]
+        body = statute_parts[i+1].strip()
         full_text = f"{header}\n{body}"
-        documents.append(Document(page_content=full_text, metadata={"source":"https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB"}))
+        statute_documents.append(Document(page_content=full_text, metadata={"source":"https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB{i}"}))
+    print(f"Created {len(statute_documents)} statute documents\n\n")
+    #print(f"Last Document: {statute_documents[len(statute_documents) - 1].page_content}")
     
-    #chunking self_help_formal_probate.txt
-    with open("docs/self_help_formal_probate.txt", "r", encoding="utf-8") as f:
-        text = f.read()
+    print("Chunking Self_Help Files")
 
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
+    self_help_dicts = self_help_docs_chunker.main()
 
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
+    self_help_documents = []
+
+    for i in range(len(self_help_dicts)):
+        source = self_help_dicts[i]["source"]
+        parts = self_help_dicts[i]["parts"]
+
+        for i in range(1, len(parts) - 1, 2):
+            #if i + 1 < len(parts):
             header = parts[i].strip()
             body = parts[i+1].strip()
         
@@ -47,223 +53,35 @@ def main():
             
             full_text = f"{header}\n{body}"
         
-            documents.append(
+            self_help_documents.append(
                 Document(
                     page_content=full_text,
                     metadata={
-                        "source": "https://selfhelp.courts.ca.gov/probate/formal-probate"
+                        "source": source
                     }
                 )
             )
+    print(f"Created {len(self_help_documents)} self_help_documents\n\n")
+    #print(f"Last Document: {self_help_documents[len(self_help_documents) - 1].page_content}")
 
-    #chunking self_help_guardianship.txt
-    with open("docs/self_help_guardianship.txt", "r", encoding="utf-8") as f:
-        text = f.read()
-
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
-
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
-            header = parts[i].strip()
-            body = parts[i+1].strip()
-        
-            if not body: continue # Skip headers with no text
-            
-            full_text = f"{header}\n{body}"
-        
-            documents.append(
-                Document(
-                    page_content=full_text,
-                    metadata={
-                        "source": "https://selfhelp.courts.ca.gov/guardianship"
-                    }
-                )
-            )
-
-    #chunking self_help_impairment.txt
-    with open("docs/self_help_impairment.txt", "r", encoding="utf-8") as f:
-        text = f.read()
-
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
-
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
-            header = parts[i].strip()
-            body = parts[i+1].strip()
-        
-            if not body: continue # Skip headers with no text
-            
-            full_text = f"{header}\n{body}"
-        
-            documents.append(
-                Document(
-                    page_content=full_text,
-                    metadata={
-                        "source": "https://selfhelp.courts.ca.gov/helping-person-impairment-or-disability"
-                    }
-                )
-            )
-
-    #chunking self_help_inventory.txt
-    with open("docs/self_help_inventory.txt", "r", encoding="utf-8") as f:
-        text = f.read()
-
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
-
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
-            header = parts[i].strip()
-            body = parts[i+1].strip()
-        
-            if not body: continue # Skip headers with no text
-            
-            full_text = f"{header}\n{body}"
-        
-            documents.append(
-                Document(
-                    page_content=full_text,
-                    metadata={
-                        "source": "https://selfhelp.courts.ca.gov/probate/inventory-estimate-value"
-                    }
-                )
-            )
-
-    #chunking self_help_probate.txt
-    with open("docs/self_help_probate.txt", "r", encoding="utf-8") as f:
-        text = f.read()
-
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
-
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
-            header = parts[i].strip()
-            body = parts[i+1].strip()
-        
-            if not body: continue # Skip headers with no text
-            
-            full_text = f"{header}\n{body}"
-        
-            documents.append(
-                Document(
-                    page_content=full_text,
-                    metadata={
-                        "source": "https://selfhelp.courts.ca.gov/probate"
-                    }
-                )
-            )
-
-    #chunking self_help_simple_process.txt
-    with open("docs/self_help_simple_process.txt", "r", encoding="utf-8") as f:
-        text = f.read()
-
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
-
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
-            header = parts[i].strip()
-            body = parts[i+1].strip()
-        
-            if not body: continue # Skip headers with no text
-            
-            full_text = f"{header}\n{body}"
-        
-            documents.append(
-                Document(
-                    page_content=full_text,
-                    metadata={
-                        "source": "https://selfhelp.courts.ca.gov/probate/simple-transfer"
-                    }
-                )
-            )
-
-    #chunking self_help_small_estate3.txt
-    with open("docs/self_help_small_estate3.txt", "r", encoding="utf-8") as f:
-        text = f.read()
-
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
-
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
-            header = parts[i].strip()
-            body = parts[i+1].strip()
-        
-            if not body: continue # Skip headers with no text
-            
-            full_text = f"{header}\n{body}"
-        
-            documents.append(
-                Document(
-                    page_content=full_text,
-                    metadata={
-                        "source": "https://selfhelp.courts.ca.gov/probate/small-estate"
-                    }
-                )
-            )
-
-    #chunking self_help_terms.txt
-    with open("docs/self_help_terms.txt", "r", encoding="utf-8") as f:
-        text = f.read()
-
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
-
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
-            header = parts[i].strip()
-            body = parts[i+1].strip()
-        
-            if not body: continue # Skip headers with no text
-            
-            full_text = f"{header}\n{body}"
-        
-            documents.append(
-                Document(
-                    page_content=full_text,
-                    metadata={
-                        "source": "https://selfhelp.courts.ca.gov/probate/terms"
-                    }
-                )
-            )
-
-    #chunking self_help_wills.txt
-    with open("docs/self_help_wills.txt", "r", encoding="utf-8") as f:
-        text = f.read()
-
-    #Split on #
-    parts = re.split(r"(^#+\s+.*)", text, flags=re.MULTILINE)
-
-    for i in range(1, len(parts), 2):
-        if i + 1 < len(parts):
-            header = parts[i].strip()
-            body = parts[i+1].strip()
-        
-            if not body: continue # Skip headers with no text
-            
-            full_text = f"{header}\n{body}"
-        
-            documents.append(
-                Document(
-                    page_content=full_text,
-                    metadata={
-                        "source": "https://selfhelp.courts.ca.gov/wills-estates-probate/legal-documents"
-                    }
-                )
-            )
-    
+    return
     print("Chunking complete")
 
     #2 Embed and Store in DB
+    """
+    statute_db: corresponds to CA Probate Code
+    self_help_db: corresponds to CA Courts Self Help Website Probate Section
+    rule_db: corresponds to CA Rules of Court
+    form_db: corresponds to CA Judicial Council Forms
+    """
     print("Embedding and Storing in DB")
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    db = Chroma.from_documents(documents, embeddings, persist_directory="chroma_db")
+    statute_db = Chroma.from_documents(statute_documents, embeddings, persist_directory="statute_db")
+    self_help_db = Chroma.from_documents(self_help_documents, embeddings, persist_directory="self_help_db")
+    rule_db = Chroma.from_documents(rule_documents, embeddings, persist_directory="rule_db")
+    form_db = Chroma.from_documents(form_documents, embeddings, persist_directory="form_db")
     
-    print(f"Verified metadata for first chunk: {documents[0].metadata}")
+    #print(f"Verified metadata for first chunk: {documents[0].metadata}")
     print("Ingestion complete")
 
 if __name__ == "__main__":
