@@ -1,0 +1,5 @@
+download folders statute_docs and self_help_docs
+download statute_docs_chunker.py and self_help_docs_chunker.py
+download chunker.py and use if you need to chunk a pdf of docx file
+download ingestion_pipeline.py NOT ingestion_pipeline2.py(tried deleting this but it came back)
+download retrieval_pipeline2.py NOT retrieval_pipeline.py(also tried to delete this but it came back)
