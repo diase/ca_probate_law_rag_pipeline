@@ -1,0 +1,4 @@
+download folders statute_docs and self_help_docs
+download statute_docs_chunker.py and self_help_docs_chunker.py
+download ingestion_pipeline.py and retrieval_pipeline2.py
+IGNORE ingestion_pipeline2.py and retrieval_pipeline.py
