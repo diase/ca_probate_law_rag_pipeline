@@ -1,5 +1,6 @@
 - Create more test questions that it should be able to answer
-- Automate testing [done]
+- Automate testing our RAG [done]
+- Automate testing with ChatGPT for comparison (second retrieval pipeline)
 - See which questions it can / can't answer, retrieve more documents to enhance its responses
 - Possibly adjust the k value + threshold depending on the responses to the test questions
 - Create website, host the backend on Runpod and the front end on Vercel; create the endpoints using FastAPI
