@@ -10,10 +10,13 @@ def main():
     #1. Embeddings: same as ingestion
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-    #2. Load existing Chroma DB
-    db = Chroma(persist_directory="chroma_db", embedding_function=embeddings)
-    print("Chroma DB loaded")
-    print("Total chunks in DB:", db._collection.count())
+    #2. Load existing Chroma DBs
+    statute_db = Chroma(persist_directory="statute_db", embedding_function = embeddings)
+    self_help_db = Chroma(persist_directory="self_help_db", embedding_function = embeddings)
+    rule_db = Chroma(persist_directory="rule_db", embedding_function = embeddings)
+    form_db = Chroma(persist_directory="form_db", embedding_function = embeddings)
+    print("Chroma DBs loaded")
+    #print("Total chunks in DB:", db._collection.count())
 
     ###Delete Later
     #results = db.similarity_search("6110", k=5) 
@@ -30,7 +33,23 @@ def main():
             break 
 
         #4. Retrieve top k results with scores(Cosine Distance)
-        raw_results = db.similarity_search_with_score(query, k=20)
+        form_keywords = ["form", "file", "submit", "attach"]
+        rule_keywords = ["notice", "deadline", "hearing", "inventory", "petition", "time limit"]
+        statute_keywords = ["inherit", "liable", "duty", "power"]
+        self_help_keywords = ["what is", "explain", "overview", "basics", "summary", "summarize"]
+
+        if any(w in query.lower() for w in form_keywords):
+            db = form_db
+        elif any(w in query.lower() for w in rule_keywords):
+            db = rule_db
+        elif any(w in query.lower() for w in statute_keywords):
+            db = statute_db
+        elif any(w in query.lower() for w in self_help_keywords):
+            db = self_help_db
+        else:
+            db = statute_db
+
+        raw_results = db.similarity_search_with_score(query.lower(), k=10)
         print("\n--- Similarities ---")
         for doc, dist in raw_results:
             similarity = 1 - dist  # Convert distance to similarity
@@ -43,7 +62,7 @@ def main():
         filtered_docs = []
         # Sort similarities descending
         sorted_sims = sorted(similarities, reverse=True)
-        # Compute index for top 80%
+        # Compute index for top 50%
         cutoff_index = int(len(sorted_sims) * 0.5) #keep top 50%
         # The similarity at that position becomes the threshold
         threshold = sorted_sims[cutoff_index]
@@ -74,17 +93,13 @@ def main():
         #6. Build content for Gemini
         contents = [
             {"role": "user",
-             "parts": [{"text": "You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely. If the answer is not in the context, say you don't know."}]
-            },
-            {"role": "user",
-             "parts": [
-                 {"text": f"Question: {query}"}
-            ]
+             "parts": [{"text": "You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely. If the answer is not in the context, say you don't know."},
+            {"text": f"Question: {query.lower()}"}]
             }
         ]
         # Add each retrieved document as its own part
         for doc, score in filtered_docs: 
-            contents.append({ "role": "user", "parts": [ {"text": doc.page_content} ] })
+            contents[0]["parts"].append({"text": f"Context: {doc.page_content}"})
 
         #7. Get answer from Gemini
         print("\n--- Answer ---\n")
