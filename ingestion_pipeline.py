@@ -6,7 +6,7 @@ from langchain_chroma import Chroma
 import statute_docs_chunker
 import self_help_docs_chunker
 #import rule_docs_chunker
-#import form_docs_chunker
+import form_scraper
 import shutil
 
 if os.path.exists("statute_db"):
@@ -64,6 +64,32 @@ def main():
     print(f"Created {len(self_help_documents)} self_help_documents\n\n")
     #print(f"Last Document: {self_help_documents[len(self_help_documents) - 1].page_content}")
 
+    print("Chunking Form Files")
+
+    form_documents = []
+
+    form_dicts = form_scraper.main()
+
+    for i in range(len(form_dicts)):
+        header = form_dicts[i]["header"]
+        body = form_dicts[i]["body"]
+        source = form_dicts[i]["source"]
+
+        full_text = f"{header}\n{body}"
+
+        form_documents.append(
+            Document(
+                page_content=full_text,
+                metadata={
+                    "source":source
+                    }
+                )
+            )
+
+    print(f"Created {len(form_documents)} form_documents\n\n")
+    print(f"Last Form doc: {form_documents[len(form_documents) - 1].page_content}")
+
+    print("Chunking Rule Files")
     return
     print("Chunking complete")
 
