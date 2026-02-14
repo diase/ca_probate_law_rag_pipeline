@@ -1,12 +1,11 @@
 import os
-import re
 from langchain_core.documents import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 import statute_docs_chunker
 import self_help_docs_chunker
 #import rule_docs_chunker
-import form_scraper
+import json
 import shutil
 
 if os.path.exists("statute_db"):
@@ -68,7 +67,10 @@ def main():
 
     form_documents = []
 
-    form_dicts = form_scraper.main()
+    #form_scraper.main()
+
+    with open("form_docs/dicts", "r") as f:
+        form_dicts = json.load(f)
 
     for i in range(len(form_dicts)):
         header = form_dicts[i]["header"]
@@ -89,8 +91,10 @@ def main():
     print(f"Created {len(form_documents)} form_documents\n\n")
     print(f"Last Form doc: {form_documents[len(form_documents) - 1].page_content}")
 
-    print("Chunking Rule Files")
     return
+
+    print("Chunking Rule Files")
+    
     print("Chunking complete")
 
     #2 Embed and Store in DB

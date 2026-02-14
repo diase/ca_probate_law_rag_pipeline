@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import forms_link_scraper
+import json
 
 def scrape_page(url):
     try: 
@@ -47,7 +48,10 @@ def main():
     for i in to_return:
         print(f"\n\n{i}")
     print(f"Final dict: {to_return[len(to_return) - 1]}")
-    return to_return
+    #return to_return
+    with open("form_docs/dicts", "w") as f:
+        json.dump(to_return, f)
+
     
 if __name__ == "__main__":
     main()
