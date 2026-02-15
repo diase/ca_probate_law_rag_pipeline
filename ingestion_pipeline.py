@@ -67,8 +67,6 @@ def main():
 
     form_documents = []
 
-    #form_scraper.main()
-
     with open("form_docs/dicts", "r") as f:
         form_dicts = json.load(f)
 
@@ -89,11 +87,33 @@ def main():
             )
 
     print(f"Created {len(form_documents)} form_documents\n\n")
-    print(f"Last Form doc: {form_documents[len(form_documents) - 1].page_content}")
-
-    return
+    #print(f"Last Form doc: {form_documents[len(form_documents) - 1].page_content}")
 
     print("Chunking Rule Files")
+
+    rule_documents = []
+
+    with open("rule_docs/dicts", "r") as f:
+        rule_dicts = json.load(f)
+
+    for i in range(len(rule_dicts)):
+        header = rule_dicts[i]["header"]
+        body = rule_dicts[i]["body"]
+        source = rule_dicts[i]["source"]
+
+        full_text = f"{header}\n{body}"
+
+        rule_documents.append(
+            Document(
+                page_content=full_text,
+                metadata={
+                    "source":source
+                    }
+                )
+            )
+
+    print(f"Created {len(rule_documents)} form_documents\n\n")
+    #print(f"Last Rule doc: {rule_documents[len(rule_documents) - 1].page_content}")
     
     print("Chunking complete")
 
@@ -111,7 +131,6 @@ def main():
     rule_db = Chroma.from_documents(rule_documents, embeddings, persist_directory="rule_db")
     form_db = Chroma.from_documents(form_documents, embeddings, persist_directory="form_db")
     
-    #print(f"Verified metadata for first chunk: {documents[0].metadata}")
     print("Ingestion complete")
 
 if __name__ == "__main__":
