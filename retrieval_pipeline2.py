@@ -10,12 +10,15 @@ def main():
     #1. Embeddings: same as ingestion
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-    #2. Load existing Chroma DBs
+    #2. Load existing Chroma DB
+    """
     statute_db = Chroma(persist_directory="statute_db", embedding_function = embeddings)
     self_help_db = Chroma(persist_directory="self_help_db", embedding_function = embeddings)
     rule_db = Chroma(persist_directory="rule_db", embedding_function = embeddings)
     form_db = Chroma(persist_directory="form_db", embedding_function = embeddings)
-    print("Chroma DBs loaded")
+    """
+    db = Chroma(persist_directory="full_db", embedding_function=embeddings)
+    print("Chroma DB loaded")
     #print("Total chunks in DB:", db._collection.count())
 
     ###Delete Later
@@ -33,6 +36,7 @@ def main():
             break 
 
         #4. Retrieve top k results with scores(Cosine Distance)
+        """
         form_keywords = ["form", "file", "submit", "attach", "de-", "de -", "ge-", "ge -", "app-", "app -", "jv-", "jv -"]
         rule_keywords = ["notice", "deadline", "hearing", "inventory", "petition", "time limit"]
         statute_keywords = ["inherit", "liable", "duty", "power"]
@@ -48,6 +52,7 @@ def main():
             db = self_help_db
         else:
             db = statute_db
+        """
 
         raw_results = db.similarity_search_with_score(query.lower(), k=10)
         print("\n--- Similarities ---")

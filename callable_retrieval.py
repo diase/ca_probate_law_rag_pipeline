@@ -14,12 +14,15 @@ class RetrievalPipeline:
         #1. Embeddings: same as ingestion
         self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-        #2. Load existing Chroma DBs
-        self.statute_db = Chroma(persist_directory="statute_db", embedding_function = embeddings)
-        self.self_help_db = Chroma(persist_directory="self_help_db", embedding_function = embeddings)
-        self.rule_db = Chroma(persist_directory="rule_db", embedding_function = embeddings)
-        self.form_db = Chroma(persist_directory="form_db", embedding_function = embeddings)
-        print("Chroma DBs loaded")
+        #2. Load existing Chroma DB
+        """
+        self.statute_db = Chroma(persist_directory="statute_db", embedding_function = self.embeddings)
+        self.self_help_db = Chroma(persist_directory="self_help_db", embedding_function = self.embeddings)
+        self.rule_db = Chroma(persist_directory="rule_db", embedding_function = self.embeddings)
+        self.form_db = Chroma(persist_directory="form_db", embedding_function = self.embeddings)
+        """
+        self.db = Chroma(persist_directory="full_db", embedding_function=self.embeddings)
+        print("Chroma DB loaded")
 
     def ask_questions(self, question):
         #1. Initialize Gemini LLM
@@ -32,6 +35,7 @@ class RetrievalPipeline:
         if query.lower() in {"q", "quit", "exit"}:
             return
         
+        """
         #2. Route to correct db
         form_keywords = ["form", "file", "submit", "attach", "de-", "de -", "ge-", "ge -", "app-", "app -", "jv-", "jv -"]
         rule_keywords = ["notice", "deadline", "hearing", "inventory", "petition", "time limit"]
@@ -48,6 +52,7 @@ class RetrievalPipeline:
             self.db = self.self_help_db
         else:
             self.db = self.statute_db
+        """
 
         #3. Retrieve top k results with scores(Cosine Distance)
         raw_results = self.db.similarity_search_with_score(query, k=10)
@@ -92,7 +97,7 @@ class RetrievalPipeline:
         #6. Build content for Gemini
         contents = [
             {"role": "user",
-             "parts": [{"text": "You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely. If the answer is not in the context, say you don't know."},
+             "parts": [{"text": "You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely and list the source. If the answer is not in the context, say you don't know."},
             {"text": f"Question: {query.lower()}"}]
             }
         ]

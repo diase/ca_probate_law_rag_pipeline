@@ -7,6 +7,8 @@ import self_help_docs_chunker
 import json
 import shutil
 
+if os.path.exists("full_db"):
+    shutil.rmtree("full_db")
 if os.path.exists("statute_db"):
     shutil.rmtree("statute_db")
 if os.path.exists("self_help_db"):
@@ -114,6 +116,9 @@ def main():
     print(f"Created {len(rule_documents)} form_documents\n\n")
     #print(f"Last Rule doc: {rule_documents[len(rule_documents) - 1].page_content}")
     
+    #creating list for all docs
+    documents = statute_documents + self_help_documents + rule_documents + form_documents
+
     print("Chunking complete")
 
     #2 Embed and Store in DB
@@ -128,12 +133,15 @@ def main():
 
     cosine_config = {"hnsw:space": "cosine"}
 
+    """
     statute_db = Chroma.from_documents(statute_documents, embeddings, persist_directory="statute_db", collection_metadata=cosine_config)
     self_help_db = Chroma.from_documents(self_help_documents, embeddings, persist_directory="self_help_db", collection_metadata=cosine_config)
     rule_db = Chroma.from_documents(rule_documents, embeddings, persist_directory="rule_db", collection_metadata=cosine_config)
     form_db = Chroma.from_documents(form_documents, embeddings, persist_directory="form_db", collection_metadata=cosine_config)
-    
-    print(f"verify collection metadata is cosine: {statute_db._collection_metadata}\n\n")
+    """
+    full_db = Chroma.from_documents(documents, embeddings, persist_directory="full_db", collection_metadata=cosine_config)
+
+    print(f"verify collection metadata is cosine: {full_db._collection_metadata}\n\n")
     print("Ingestion complete")
 
 if __name__ == "__main__":
