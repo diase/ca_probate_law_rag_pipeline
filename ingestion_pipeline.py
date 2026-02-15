@@ -4,7 +4,6 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 import statute_docs_chunker
 import self_help_docs_chunker
-#import rule_docs_chunker
 import json
 import shutil
 
@@ -126,11 +125,15 @@ def main():
     """
     print("Embedding and Storing in DB")
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    statute_db = Chroma.from_documents(statute_documents, embeddings, persist_directory="statute_db")
-    self_help_db = Chroma.from_documents(self_help_documents, embeddings, persist_directory="self_help_db")
-    rule_db = Chroma.from_documents(rule_documents, embeddings, persist_directory="rule_db")
-    form_db = Chroma.from_documents(form_documents, embeddings, persist_directory="form_db")
+
+    cosine_config = {"hnsw:space": "cosine"}
+
+    statute_db = Chroma.from_documents(statute_documents, embeddings, persist_directory="statute_db", collection_metadata=cosine_config)
+    self_help_db = Chroma.from_documents(self_help_documents, embeddings, persist_directory="self_help_db", collection_metadata=cosine_config)
+    rule_db = Chroma.from_documents(rule_documents, embeddings, persist_directory="rule_db", collection_metadata=cosine_config)
+    form_db = Chroma.from_documents(form_documents, embeddings, persist_directory="form_db", collection_metadata=cosine_config)
     
+    print(f"verify collection metadata is cosine: {statute_db._collection_metadata}\n\n")
     print("Ingestion complete")
 
 if __name__ == "__main__":

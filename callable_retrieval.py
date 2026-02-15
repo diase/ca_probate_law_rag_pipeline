@@ -96,15 +96,18 @@ class RetrievalPipeline:
             {"text": f"Question: {query.lower()}"}]
             }
         ]
-        # Add each retrieved document as its own part
-        for doc, score in filtered_docs: 
-            contents[0]["parts"].append({"text": f"Context: {doc.page_content}"})
+        # Add retreived documents as one part
+        parts = []
+        for doc, score in filtered_docs:
+            parts.append(f"{doc.metadata.get("source")}\n{doc.page_content}")
+        to_append = "\n\n".join(parts) 
+        contents[0]["parts"].append({"text": f"Context: {to_append}"})
 
         #7. Get answer from Gemini
         print("\n--- Answer ---\n")
 
         config = {
-            "temperature":0.2,
+            "temperature":0.1,
             "top_p":1.0,
             "top_k":10,
             "max_output_tokens":2048,}

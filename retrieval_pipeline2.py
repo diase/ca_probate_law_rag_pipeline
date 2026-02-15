@@ -33,10 +33,10 @@ def main():
             break 
 
         #4. Retrieve top k results with scores(Cosine Distance)
-        form_keywords = ["form", "file", "submit", "attach"]
+        form_keywords = ["form", "file", "submit", "attach", "de-", "de -", "ge-", "ge -", "app-", "app -", "jv-", "jv -"]
         rule_keywords = ["notice", "deadline", "hearing", "inventory", "petition", "time limit"]
         statute_keywords = ["inherit", "liable", "duty", "power"]
-        self_help_keywords = ["what is", "explain", "overview", "basics", "summary", "summarize"]
+        self_help_keywords = ["what is", "when is", "explain", "overview", "basics", "summary", "summarize"]
 
         if any(w in query.lower() for w in form_keywords):
             db = form_db
@@ -73,9 +73,7 @@ def main():
             if similarity >= threshold:
                 filtered_docs.append((doc, distance))
         
-        #filtered_docs = raw_results
-
-        #Handle no results
+        #Handle no results(Useless currently as we keep 50%)
         
         if not filtered_docs:
             print(f"\nNo documents found above similarity threshold {threshold}.")
@@ -93,19 +91,22 @@ def main():
         #6. Build content for Gemini
         contents = [
             {"role": "user",
-             "parts": [{"text": "You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely. If the answer is not in the context, say you don't know."},
+             "parts": [{"text": "You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely citing the source. If the answer is not in the context, say you don't know."},
             {"text": f"Question: {query.lower()}"}]
             }
         ]
-        # Add each retrieved document as its own part
-        for doc, score in filtered_docs: 
-            contents[0]["parts"].append({"text": f"Context: {doc.page_content}"})
+        # Add retreived documents as one part
+        parts = []
+        for doc, score in filtered_docs:
+            parts.append(f"{doc.metadata.get("source")}\n{doc.page_content}")
+        to_append = "\n\n".join(parts) 
+        contents[0]["parts"].append({"text": f"Context: {to_append}"})
 
         #7. Get answer from Gemini
         print("\n--- Answer ---\n")
 
         config = {
-            "temperature":0.2,
+            "temperature":0.1,
             "top_p":1.0,
             "top_k":10,
             "max_output_tokens":2048,}
