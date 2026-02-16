@@ -30,7 +30,7 @@ def main():
         header = statute_parts[i]
         body = statute_parts[i+1].strip()
         full_text = f"{header}\n{body}"
-        statute_documents.append(Document(page_content=full_text, metadata={"source":"https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB{i}"}))
+        statute_documents.append(Document(page_content=full_text, metadata={"source":f"https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB{i}"}))
     print(f"Created {len(statute_documents)} statute documents\n\n")
     #print(f"Last Document: {statute_documents[len(statute_documents) - 1].page_content}")
     
