@@ -1,22 +1,19 @@
-Form-related
+@@@ - Form-related
 Which form needs to be filled out to start the probate process?
 Which form do I use to notify the beneficiaries of a will that the probate process has started?
 Which form appoints the executor of a will?
 Which form do I use to list the assets of the estate?
-
-Rule-related (how / logistics)
+$$$ - Rule-related (how / logistics)
 How soon do the beneficiaries need to be notified?
 How soon does the will need to be submitted to the court?
 Do known creditors need to be notified about the start of the probate process?
 If the person has debts, who gets paid from the estate first if there isn't enough to cover their debts and there are beneficiaries stated in the will that will receive specific amounts from the estate?
-
-Self-help
+### - Self-help
 What is probate law?
 What happens during the probate process?
 How long does probate take?
 How do I get a will?
-
-Statute-related (defining the laws)
+&&& - Statute-related (defining the laws)
 When is probate required?
 Is probate always required after someone dies?
 What happens if there is a will?
