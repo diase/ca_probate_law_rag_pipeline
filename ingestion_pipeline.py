@@ -1,14 +1,14 @@
 import os
-import re
 from langchain_core.documents import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 import statute_docs_chunker
 import self_help_docs_chunker
-#import rule_docs_chunker
-import form_scraper
+import json
 import shutil
 
+if os.path.exists("full_db"):
+    shutil.rmtree("full_db")
 if os.path.exists("statute_db"):
     shutil.rmtree("statute_db")
 if os.path.exists("self_help_db"):
@@ -30,7 +30,7 @@ def main():
         header = statute_parts[i]
         body = statute_parts[i+1].strip()
         full_text = f"{header}\n{body}"
-        statute_documents.append(Document(page_content=full_text, metadata={"source":"https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB{i}"}))
+        statute_documents.append(Document(page_content=full_text, metadata={"source":f"https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB{i}"}))
     print(f"Created {len(statute_documents)} statute documents\n\n")
     #print(f"Last Document: {statute_documents[len(statute_documents) - 1].page_content}")
     
@@ -68,7 +68,8 @@ def main():
 
     form_documents = []
 
-    form_dicts = form_scraper.main()
+    with open("form_docs/dicts", "r") as f:
+        form_dicts = json.load(f)
 
     for i in range(len(form_dicts)):
         header = form_dicts[i]["header"]
@@ -87,10 +88,37 @@ def main():
             )
 
     print(f"Created {len(form_documents)} form_documents\n\n")
-    print(f"Last Form doc: {form_documents[len(form_documents) - 1].page_content}")
+    #print(f"Last Form doc: {form_documents[len(form_documents) - 1].page_content}")
 
     print("Chunking Rule Files")
-    return
+
+    rule_documents = []
+
+    with open("rule_docs/dicts", "r") as f:
+        rule_dicts = json.load(f)
+
+    for i in range(len(rule_dicts)):
+        header = rule_dicts[i]["header"]
+        body = rule_dicts[i]["body"]
+        source = rule_dicts[i]["source"]
+
+        full_text = f"{header}\n{body}"
+
+        rule_documents.append(
+            Document(
+                page_content=full_text,
+                metadata={
+                    "source":source
+                    }
+                )
+            )
+
+    print(f"Created {len(rule_documents)} form_documents\n\n")
+    #print(f"Last Rule doc: {rule_documents[len(rule_documents) - 1].page_content}")
+    
+    #creating list for all docs
+    documents = statute_documents + self_help_documents + rule_documents + form_documents
+
     print("Chunking complete")
 
     #2 Embed and Store in DB
@@ -102,12 +130,18 @@ def main():
     """
     print("Embedding and Storing in DB")
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    statute_db = Chroma.from_documents(statute_documents, embeddings, persist_directory="statute_db")
-    self_help_db = Chroma.from_documents(self_help_documents, embeddings, persist_directory="self_help_db")
-    rule_db = Chroma.from_documents(rule_documents, embeddings, persist_directory="rule_db")
-    form_db = Chroma.from_documents(form_documents, embeddings, persist_directory="form_db")
-    
-    #print(f"Verified metadata for first chunk: {documents[0].metadata}")
+
+    cosine_config = {"hnsw:space": "cosine"}
+
+    """
+    statute_db = Chroma.from_documents(statute_documents, embeddings, persist_directory="statute_db", collection_metadata=cosine_config)
+    self_help_db = Chroma.from_documents(self_help_documents, embeddings, persist_directory="self_help_db", collection_metadata=cosine_config)
+    rule_db = Chroma.from_documents(rule_documents, embeddings, persist_directory="rule_db", collection_metadata=cosine_config)
+    form_db = Chroma.from_documents(form_documents, embeddings, persist_directory="form_db", collection_metadata=cosine_config)
+    """
+    full_db = Chroma.from_documents(documents, embeddings, persist_directory="full_db", collection_metadata=cosine_config)
+
+    print(f"verify collection metadata is cosine: {full_db._collection_metadata}\n\n")
     print("Ingestion complete")
 
 if __name__ == "__main__":

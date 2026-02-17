@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import forms_link_scraper
+import rules_links_scraper
 import json
 
 def scrape_page(url):
@@ -21,35 +21,35 @@ def main():
     #Make list of dicts with source, header, body
     to_return = []
 
-    links = forms_link_scraper.main()
+    links = rules_links_scraper.main()
     for link in links:
-        form_dict = {}
+        rule_dict = {}
 
-        url = f"https://selfhelp.courts.ca.gov/{link}"
+        url = f"https://courts.ca.gov/{link}"
 
-        form_dict["source"] = url
+        rule_dict["source"] = url
 
         soup = scrape_page(url)
 
-        #Header: jcc-hero__title h1 tag
-        header_tag = soup.find("h1", class_="jcc-hero__title") 
+        #Header:
+        header_tag = soup.find("h1", class_="hangover__title stack__sm-space") 
         header_text = header_tag.get_text(strip=True) if header_tag else None 
         
-        #Body: jcc-hero__lead under div tag
-        body_tag = soup.find("div", class_="jcc-hero__lead")
+        #Body:
+        body_tag = soup.find("div", class_="box roc__rule__content")
         body_text = body_tag.get_text(strip=True) if body_tag else None
         
         if header_text != None and body_text != None:
-            form_dict["header"] = header_text
-            form_dict["body"] = body_text
-            to_return.append(form_dict)
+            rule_dict["header"] = header_text
+            rule_dict["body"] = body_text
+            to_return.append(rule_dict)
     
     print(f"Created list of {len(to_return)} dictionaries\n\n")
     for i in to_return:
         print(f"\n\n{i}")
-    print(f"Final dict: {to_return[len(to_return) - 1]}")
+    #print(f"Final dict: {to_return[len(to_return) - 1]}")
     #return to_return
-    with open("form_docs/dicts", "w") as f:
+    with open("rule_docs/dicts", "w") as f:
         json.dump(to_return, f)
 
     

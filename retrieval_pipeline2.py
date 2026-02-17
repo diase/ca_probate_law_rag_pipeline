@@ -10,12 +10,15 @@ def main():
     #1. Embeddings: same as ingestion
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-    #2. Load existing Chroma DBs
+    #2. Load existing Chroma DB
+    """
     statute_db = Chroma(persist_directory="statute_db", embedding_function = embeddings)
     self_help_db = Chroma(persist_directory="self_help_db", embedding_function = embeddings)
     rule_db = Chroma(persist_directory="rule_db", embedding_function = embeddings)
     form_db = Chroma(persist_directory="form_db", embedding_function = embeddings)
-    print("Chroma DBs loaded")
+    """
+    db = Chroma(persist_directory="full_db", embedding_function=embeddings)
+    print("Chroma DB loaded")
     #print("Total chunks in DB:", db._collection.count())
 
     ###Delete Later
@@ -33,10 +36,11 @@ def main():
             break 
 
         #4. Retrieve top k results with scores(Cosine Distance)
-        form_keywords = ["form", "file", "submit", "attach"]
+        """
+        form_keywords = ["form", "file", "submit", "attach", "de-", "de -", "ge-", "ge -", "app-", "app -", "jv-", "jv -"]
         rule_keywords = ["notice", "deadline", "hearing", "inventory", "petition", "time limit"]
         statute_keywords = ["inherit", "liable", "duty", "power"]
-        self_help_keywords = ["what is", "explain", "overview", "basics", "summary", "summarize"]
+        self_help_keywords = ["what is", "when is", "explain", "overview", "basics", "summary", "summarize"]
 
         if any(w in query.lower() for w in form_keywords):
             db = form_db
@@ -48,6 +52,7 @@ def main():
             db = self_help_db
         else:
             db = statute_db
+        """
 
         raw_results = db.similarity_search_with_score(query.lower(), k=10)
         print("\n--- Similarities ---")
@@ -73,9 +78,7 @@ def main():
             if similarity >= threshold:
                 filtered_docs.append((doc, distance))
         
-        #filtered_docs = raw_results
-
-        #Handle no results
+        #Handle no results(Useless currently as we keep 50%)
         
         if not filtered_docs:
             print(f"\nNo documents found above similarity threshold {threshold}.")
@@ -91,23 +94,37 @@ def main():
             print("\n---\n")
 
         #6. Build content for Gemini
+        system_instructions = (
+            "You are 'California Probate Guide,' an expert legal assistant specialized in California Probate Law. "
+            "Your tone is professional, clear, and supportive. Use the provided legal context to explain complex rules "
+            "as if you are speaking to a person who is not a lawyer. "
+            "\n\nRULES:"
+            "\n- ONLY use the provided legal context. If a question is outside the legal context, say 'I don't have that specific data, but you might check the following sources:https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB, https://courts.ca.gov/cms/rules/index/seven, https://selfhelp.courts.ca.gov/find-forms?query=probate, https://selfhelp.courts.ca.gov/probate-index'"
+            "\n- CITATIONS: You MUST cite the source URL for every fact you state. Format: (Source: [SECOND LINE OF EVERY CHUNK])"
+            "\n- STRUCTURE: Use bolding for key terms and bullet points for lists of requirements."
+        )
+
+        # Add retreived documents as one part
+        parts = []
+        for i, (doc, score) in enumerate(filtered_docs, 1):
+            parts.append(f"DOCUMENT {i}\nSOURCE: {doc.metadata.get('source')}\nLEGAL CONTEXT: {doc.page_content}")
+        to_append = "\n\n".join(parts)
+
         contents = [
             {"role": "user",
-             "parts": [{"text": "You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely. If the answer is not in the context, say you don't know."},
-            {"text": f"Question: {query.lower()}"}]
+             "parts": [{"text": f"{system_instructions}"}, 
+                       {"text": f"USER QUESTION: {query.lower()}"},
+                       {"text": f"LEGAL CONTEXT: {to_append}"}]
             }
         ]
-        # Add each retrieved document as its own part
-        for doc, score in filtered_docs: 
-            contents[0]["parts"].append({"text": f"Context: {doc.page_content}"})
 
         #7. Get answer from Gemini
         print("\n--- Answer ---\n")
 
         config = {
-            "temperature":0.2,
-            "top_p":1.0,
-            "top_k":10,
+            "temperature":0.1,
+            "top_p":0.9,
+            "top_k":40,
             "max_output_tokens":2048,}
 
         model = genai.GenerativeModel(model_name="gemini-2.5-flash", generation_config=config)

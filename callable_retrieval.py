@@ -15,30 +15,54 @@ class RetrievalPipeline:
         self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
         #2. Load existing Chroma DB
-        self.db = Chroma(persist_directory="chroma_db", embedding_function=self.embeddings)
+        """
+        self.statute_db = Chroma(persist_directory="statute_db", embedding_function = self.embeddings)
+        self.self_help_db = Chroma(persist_directory="self_help_db", embedding_function = self.embeddings)
+        self.rule_db = Chroma(persist_directory="rule_db", embedding_function = self.embeddings)
+        self.form_db = Chroma(persist_directory="form_db", embedding_function = self.embeddings)
+        """
+        self.db = Chroma(persist_directory="full_db", embedding_function=self.embeddings)
         print("Chroma DB loaded")
-        print("Total chunks in DB:", self.db._collection.count())
 
     def ask_questions(self, question):
         #1. Initialize Gemini LLM
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        print("Gemini LLM initialized")
+        print("\n\nGemini LLM initialized")
 
         print(f"Your Question: {question}")
         
         query = question
         if query.lower() in {"q", "quit", "exit"}:
-            return 
+            return
+        
+        """
+        #2. Route to correct db
+        form_keywords = ["form", "file", "submit", "attach", "de-", "de -", "ge-", "ge -", "app-", "app -", "jv-", "jv -"]
+        rule_keywords = ["notice", "deadline", "hearing", "inventory", "petition", "time limit"]
+        statute_keywords = ["inherit", "liable", "duty", "power"]
+        self_help_keywords = ["what is", "when is", "explain", "overview", "basics", "summary", "summarize"]
 
-        #4. Retrieve top k results with scores(Cosine Distance)
-        raw_results = self.db.similarity_search_with_score(query, k=20)
+        if any(w in query.lower() for w in form_keywords):
+            self.db = self.form_db
+        elif any(w in query.lower() for w in rule_keywords):
+            self.db = self.rule_db
+        elif any(w in query.lower() for w in statute_keywords):
+            self.db = self.statute_db
+        elif any(w in query.lower() for w in self_help_keywords):
+            self.db = self.self_help_db
+        else:
+            self.db = self.statute_db
+        """
+
+        #3. Retrieve top k results with scores(Cosine Distance)
+        raw_results = self.db.similarity_search_with_score(query, k=10)
         print("\n--- Similarities ---")
         for doc, dist in raw_results:
             similarity = 1 - dist  # Convert distance to similarity
             print(f"distance={dist:.4f}, similarity={similarity:.4f}")
 
         
-        #5 Set cosine similarity threshold
+        #4 Set cosine similarity threshold
         similarities = [1 - dist for _, dist in raw_results]
         #threshold = max(similarities) * 0.2 # keep any document that is at least 20% of the top similarity
         filtered_docs = []
@@ -55,7 +79,7 @@ class RetrievalPipeline:
             if similarity >= threshold:
                 filtered_docs.append((doc, distance))
 
-        #Handle no results
+        #Handle no results(Currently useless as we keep 50%)
         
         if not filtered_docs:
             print(f"\nNo documents found above similarity threshold {threshold}.")
@@ -71,32 +95,44 @@ class RetrievalPipeline:
             print("\n---\n")
 
         #6. Build content for Gemini
+        self.system_instructions = (
+            "You are 'California Probate Guide,' an expert legal assistant specialized in California Probate Law. "
+            "Your tone is professional, clear, and supportive. Use the provided legal context to explain complex rules "
+            "as if you are speaking to a person who is not a lawyer. "
+            "\n\nRULES:"
+            "\n- ONLY use the provided legal context. If a question is outside the legal context, say 'I don't have that specific data, but you might check the following sources:https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB, https://courts.ca.gov/cms/rules/index/seven, https://selfhelp.courts.ca.gov/find-forms?query=probate, https://selfhelp.courts.ca.gov/probate-index'"
+            "\n- CITATIONS: You MUST cite the source URL for every fact you state. Format: (Source: [SECOND LINE OF EVERY CHUNK])"
+            
+        )
+
+        # Add retreived documents as one part
+        parts = []
+        for i, (doc, score) in enumerate(filtered_docs, 1):
+            parts.append(f"DOCUMENT {i}\nSOURCE: {doc.metadata.get('source')}\nLEGAL CONTEXT: {doc.page_content}")
+        to_append = "\n\n".join(parts)
+
         contents = [
             {"role": "user",
-            "parts": [{"text": "You are a helpful assistant answering questions based only on the provided context. Answer clearly and concisely. If the answer is not in the context, say you don't know."}]
-            },
-            {"role": "user",
-            "parts": [
-                {"text": f"Question: {query}"}
-            ]
+             "parts": [{"text": f"{self.system_instructions}"}, 
+                       {"text": f"USER QUESTION: {query}"},
+                       {"text": f"LEGAL CONTEXT: {to_append}"}]
             }
         ]
-        # Add each retrieved document as its own part
-        for doc, score in filtered_docs: 
-            contents.append({ "role": "user", "parts": [ {"text": doc.page_content} ] })
-
+         
         #7. Get answer from Gemini
         print("\n--- Answer ---\n")
 
         config = {
-            "temperature":0.2,
-            "top_p":1.0,
-            "top_k":10,
+            "temperature":0.1,
+            "top_p":0.9,
+            "top_k":40,
             "max_output_tokens":2048,}
 
         model = genai.GenerativeModel(model_name="gemini-2.5-flash", generation_config=config)
 
         response = model.generate_content(contents)
+
+        print(f"Your Question Printed again for readability: {query.lower()}")
 
         print(response.text.strip())
 
