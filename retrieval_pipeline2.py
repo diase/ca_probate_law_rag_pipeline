@@ -75,7 +75,7 @@ def main():
         contents = [
             {"role": "user",
              "parts": [{"text": f"{system_instructions}"}, 
-                       {"text": f"USER QUESTION: {query.lower()}"},
+                       {"text": f"USER QUESTION: {query}"},
                        {"text": f"LEGAL CONTEXT: {to_append}"}]
             }
         ]
