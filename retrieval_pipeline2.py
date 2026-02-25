@@ -11,20 +11,8 @@ def main():
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
     #2. Load existing Chroma DB
-    """
-    statute_db = Chroma(persist_directory="statute_db", embedding_function = embeddings)
-    self_help_db = Chroma(persist_directory="self_help_db", embedding_function = embeddings)
-    rule_db = Chroma(persist_directory="rule_db", embedding_function = embeddings)
-    form_db = Chroma(persist_directory="form_db", embedding_function = embeddings)
-    """
     db = Chroma(persist_directory="full_db", embedding_function=embeddings)
     print("Chroma DB loaded")
-    #print("Total chunks in DB:", db._collection.count())
-
-    ###Delete Later
-    #results = db.similarity_search("6110", k=5) 
-    #for doc in results: 
-    #    print(doc.page_content[:300])
 
     #3. Initialize Gemini LLM
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -36,24 +24,6 @@ def main():
             break 
 
         #4. Retrieve top k results with scores(Cosine Distance)
-        """
-        form_keywords = ["form", "file", "submit", "attach", "de-", "de -", "ge-", "ge -", "app-", "app -", "jv-", "jv -"]
-        rule_keywords = ["notice", "deadline", "hearing", "inventory", "petition", "time limit"]
-        statute_keywords = ["inherit", "liable", "duty", "power"]
-        self_help_keywords = ["what is", "when is", "explain", "overview", "basics", "summary", "summarize"]
-
-        if any(w in query.lower() for w in form_keywords):
-            db = form_db
-        elif any(w in query.lower() for w in rule_keywords):
-            db = rule_db
-        elif any(w in query.lower() for w in statute_keywords):
-            db = statute_db
-        elif any(w in query.lower() for w in self_help_keywords):
-            db = self_help_db
-        else:
-            db = statute_db
-        """
-
         raw_results = db.similarity_search_with_score(query.lower(), k=10)
         print("\n--- Similarities ---")
         for doc, dist in raw_results:
@@ -63,28 +33,20 @@ def main():
         
         #5 Set cosine similarity threshold
         similarities = [1 - dist for _, dist in raw_results]
-        #threshold = max(similarities) * 0.2 # keep any document that is at least 20% of the top similarity
+        
         filtered_docs = []
-        # Sort similarities descending
-        sorted_sims = sorted(similarities, reverse=True)
-        # Compute index for top 50%
-        cutoff_index = int(len(sorted_sims) * 0.5) #keep top 50%
-        # The similarity at that position becomes the threshold
-        threshold = sorted_sims[cutoff_index]
-
+        
+        threshold = 0.4
 
         for doc, distance in raw_results:
             similarity = 1 - distance  # Convert distance to similarity
             if similarity >= threshold:
                 filtered_docs.append((doc, distance))
         
-        #Handle no results(Useless currently as we keep 50%)
-        
         if not filtered_docs:
             print(f"\nNo documents found above similarity threshold {threshold}.")
             continue
         
-
         #Print Retrieved Docs
         print("\n--- Retrieved Documents ---\n") 
         for i, (doc, score) in enumerate(filtered_docs, 1): 
@@ -101,7 +63,7 @@ def main():
             "\n\nRULES:"
             "\n- ONLY use the provided legal context. If a question is outside the legal context, say 'I don't have that specific data, but you might check the following sources:https://leginfo.legislature.ca.gov/faces/codesTOCSelected.xhtml?tocCode=PROB&tocTitle=+Probate+Code+-+PROB, https://courts.ca.gov/cms/rules/index/seven, https://selfhelp.courts.ca.gov/find-forms?query=probate, https://selfhelp.courts.ca.gov/probate-index'"
             "\n- CITATIONS: You MUST cite the source URL for every fact you state. Format: (Source: [SECOND LINE OF EVERY CHUNK])"
-            "\n- STRUCTURE: Use bolding for key terms and bullet points for lists of requirements."
+            
         )
 
         # Add retreived documents as one part
