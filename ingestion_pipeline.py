@@ -9,14 +9,7 @@ import shutil
 
 if os.path.exists("full_db"):
     shutil.rmtree("full_db")
-if os.path.exists("statute_db"):
-    shutil.rmtree("statute_db")
-if os.path.exists("self_help_db"):
-    shutil.rmtree("self_help_db")
-if os.path.exists("rule_db"):
-    shutil.rmtree("rule_db")
-if os.path.exists("form_db"):
-    shutil.rmtree("form_db")
+
 
 def main():
 
@@ -122,23 +115,11 @@ def main():
     print("Chunking complete")
 
     #2 Embed and Store in DB
-    """
-    statute_db: corresponds to CA Probate Code
-    self_help_db: corresponds to CA Courts Self Help Website Probate Section
-    rule_db: corresponds to CA Rules of Court
-    form_db: corresponds to CA Judicial Council Forms
-    """
     print("Embedding and Storing in DB")
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
     cosine_config = {"hnsw:space": "cosine"}
 
-    """
-    statute_db = Chroma.from_documents(statute_documents, embeddings, persist_directory="statute_db", collection_metadata=cosine_config)
-    self_help_db = Chroma.from_documents(self_help_documents, embeddings, persist_directory="self_help_db", collection_metadata=cosine_config)
-    rule_db = Chroma.from_documents(rule_documents, embeddings, persist_directory="rule_db", collection_metadata=cosine_config)
-    form_db = Chroma.from_documents(form_documents, embeddings, persist_directory="form_db", collection_metadata=cosine_config)
-    """
     full_db = Chroma.from_documents(documents, embeddings, persist_directory="full_db", collection_metadata=cosine_config)
 
     print(f"verify collection metadata is cosine: {full_db._collection_metadata}\n\n")
