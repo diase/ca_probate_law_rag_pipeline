@@ -15,12 +15,6 @@ class RetrievalPipeline:
         self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
         #2. Load existing Chroma DB
-        """
-        self.statute_db = Chroma(persist_directory="statute_db", embedding_function = self.embeddings)
-        self.self_help_db = Chroma(persist_directory="self_help_db", embedding_function = self.embeddings)
-        self.rule_db = Chroma(persist_directory="rule_db", embedding_function = self.embeddings)
-        self.form_db = Chroma(persist_directory="form_db", embedding_function = self.embeddings)
-        """
         self.db = Chroma(persist_directory="full_db", embedding_function=self.embeddings)
         print("Chroma DB loaded")
 
@@ -35,25 +29,6 @@ class RetrievalPipeline:
         if query.lower() in {"q", "quit", "exit"}:
             return
         
-        """
-        #2. Route to correct db
-        form_keywords = ["form", "file", "submit", "attach", "de-", "de -", "ge-", "ge -", "app-", "app -", "jv-", "jv -"]
-        rule_keywords = ["notice", "deadline", "hearing", "inventory", "petition", "time limit"]
-        statute_keywords = ["inherit", "liable", "duty", "power"]
-        self_help_keywords = ["what is", "when is", "explain", "overview", "basics", "summary", "summarize"]
-
-        if any(w in query.lower() for w in form_keywords):
-            self.db = self.form_db
-        elif any(w in query.lower() for w in rule_keywords):
-            self.db = self.rule_db
-        elif any(w in query.lower() for w in statute_keywords):
-            self.db = self.statute_db
-        elif any(w in query.lower() for w in self_help_keywords):
-            self.db = self.self_help_db
-        else:
-            self.db = self.statute_db
-        """
-
         #3. Retrieve top k results with scores(Cosine Distance)
         raw_results = self.db.similarity_search_with_score(query, k=10)
         print("\n--- Similarities ---")
@@ -64,14 +39,10 @@ class RetrievalPipeline:
         
         #4 Set cosine similarity threshold
         similarities = [1 - dist for _, dist in raw_results]
-        #threshold = max(similarities) * 0.2 # keep any document that is at least 20% of the top similarity
+        
         filtered_docs = []
-        # Sort similarities descending
-        sorted_sims = sorted(similarities, reverse=True)
-        # Compute index for top 80%
-        cutoff_index = int(len(sorted_sims) * 0.5) #keep top 50%
-        # The similarity at that position becomes the threshold
-        threshold = sorted_sims[cutoff_index]
+        
+        threshold = 0.4
 
 
         for doc, distance in raw_results:
@@ -79,7 +50,6 @@ class RetrievalPipeline:
             if similarity >= threshold:
                 filtered_docs.append((doc, distance))
 
-        #Handle no results(Currently useless as we keep 50%)
         
         if not filtered_docs:
             print(f"\nNo documents found above similarity threshold {threshold}.")
@@ -132,7 +102,7 @@ class RetrievalPipeline:
 
         response = model.generate_content(contents)
 
-        print(f"Your Question Printed again for readability: {query.lower()}")
+        print(f"Your Question Printed again for readability: {query}")
 
         print(response.text.strip())
 
